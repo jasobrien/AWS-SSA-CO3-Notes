@@ -14,6 +14,18 @@ This document covers Infrastructure as Code (IaC) and deployment/automation conc
 
 ---
 
+## Foundations Summary (read this first)
+
+- Think in **repeatability**: if you’ll create it more than once, prefer **IaC** over console clicks.
+- Think in **safe releases**: the exam loves strategies that reduce blast radius and enable rollback.
+- CloudFormation/CDK is about **provisioning**; CodePipeline/Build/Deploy is about **delivery**.
+- Common “best” answers include **change sets**, **rolling/blue-green/canary**, and an explicit **rollback** plan.
+- For the rest of the notes, pair this with:
+	- HA/DR patterns: [aws-ha-dr.md](aws-ha-dr.md)
+	- Cost levers: [aws-well-architected-cost.md](aws-well-architected-cost.md)
+
+---
+
 ## 1. CloudFormation
 
 ### What it is

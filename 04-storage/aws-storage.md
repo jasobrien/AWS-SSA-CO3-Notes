@@ -269,10 +269,16 @@ Key properties:
 
 ### Volume types (high-yield)
 
-- **gp3**: general purpose SSD (default recommendation)
-- **io1 / io2**: provisioned IOPS SSD (databases, low-latency + high IOPS)
-- **st1**: throughput optimized HDD (large sequential workloads)
-- **sc1**: cold HDD (cheapest HDD)
+Quick cheat table (exam-friendly):
+
+| EBS type | Media | Best for | Performance knobs (what you “buy”) | Boot volume? | Cost signal |
+|---|---|---|---|---|---|
+| **gp3** | SSD | General purpose, OS disks, most app workloads | Baseline + can provision **IOPS/throughput** (gp3 decouples performance from size better than gp2) | ✅ Yes | Default / good value |
+| **io1 / io2** | SSD | **Databases** and latency-sensitive workloads needing very high, consistent IOPS | Provisioned **IOPS** (and throughput); **io2** is the newer “premium” option | ✅ Yes | Highest (but best for strict performance) |
+| **st1** | HDD | Large **sequential** throughput (big data, ETL, log processing) | Throughput-optimized for sequential I/O (not random IOPS) | ❌ No | Cheaper than SSD |
+| **sc1** | HDD | **Infrequently accessed** large volumes (cold data) | Lowest cost HDD; low performance | ❌ No | Cheapest |
+
+Quick memory hook: SSD types (gp3/io2) = “apps + databases”; HDD types (st1/sc1) = “big sequential + cold data”.
 
 Exam “tell”:
 
@@ -290,6 +296,24 @@ Exam “tell”:
 
 - EBS encryption is easy to enable and commonly expected.
 - Snapshots inherit encryption state.
+
+### RAID on EBS (RAID 0 / RAID 1) (exam-level)
+
+You can create **software RAID** on an EC2 instance (e.g., Linux `mdadm`) using multiple EBS volumes.
+
+- **RAID 0 (striping)**: combine multiple volumes for **higher throughput / higher IOPS**
+  - Pro: performance (aggregate bandwidth/IOPS)
+  - Con: **no redundancy** — if any member volume fails, the whole array is at risk
+  - Exam use: “**Need more performance than a single EBS volume**” → RAID 0 *or* a higher-performance EBS type (io2) depending on wording
+- **RAID 1 (mirroring)**: duplicate data across volumes for redundancy
+  - Pro: can tolerate a single-volume failure
+  - Con: ~**50% usable capacity** (you pay for two volumes to store one copy)
+  - Exam note: EBS is already designed to be durable within an AZ; RAID 1 is less commonly the best answer than **snapshots/backup** and **Multi-AZ** designs
+
+Exam “tell”:
+
+- “**Increase IOPS/throughput for EC2 storage**” → consider **io2** or **RAID 0 across multiple EBS volumes**
+- “**Need shared storage across instances**” → not RAID/EBS → **EFS/FSx**
 
 ### Limits & gotchas
 

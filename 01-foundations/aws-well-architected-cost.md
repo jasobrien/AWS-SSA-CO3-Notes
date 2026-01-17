@@ -15,6 +15,20 @@ This document summarizes AWS Well-Architected thinking and cost optimization lev
 
 ---
 
+## Foundations Summary (read this first)
+
+- Well-Architected is the exam’s “tie-breaker”: choose options that improve **reliability/security** without unreasonable cost/ops burden.
+- Most “reduce cost” answers come from a small set of levers:
+	- **Commitment** (Savings Plans/RIs) for steady usage
+	- **Spot** for interruptible work
+	- **Right-sizing + Auto Scaling** for variable demand
+	- **S3 lifecycle/storage class** for data aging
+	- **VPC endpoints** to reduce **NAT Gateway** spend
+- Governance is often the first step: tags + **Budgets** + Cost Explorer/CUR.
+- Pair this with HA/DR trade-offs in [aws-ha-dr.md](aws-ha-dr.md).
+
+---
+
 ## 1. Well-Architected Framework (WA)
 
 Five pillars (commonly referenced):

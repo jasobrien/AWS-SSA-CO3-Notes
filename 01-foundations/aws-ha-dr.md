@@ -14,6 +14,18 @@ This document focuses on availability concepts (Multi-AZ) and disaster recovery 
 
 ---
 
+## Foundations Summary (read this first)
+
+- **High Availability (HA)** is usually **Multi-AZ** (within one region) and is the default expectation for “production”.
+- **Disaster Recovery (DR)** is **Multi-Region** (a region is down) and is chosen based on **RTO/RPO**.
+- Cost typically increases as you move: **backup/restore → pilot light → warm standby → active-active**.
+- Exam wording cues:
+	- “Must survive AZ failure” → **Multi-AZ**
+	- “Region-wide disaster / global users / fastest recovery” → **Multi-Region**
+- Pair this with deployment rollbacks/strategies in [aws-deployment-iac.md](aws-deployment-iac.md).
+
+---
+
 ## 1. Key Concepts: RTO and RPO
 
 - **RTO (Recovery Time Objective)**: how long you can be down.
