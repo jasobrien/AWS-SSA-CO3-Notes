@@ -58,7 +58,17 @@ These notes are organized like a small “book” (chapters by topic). They focu
 
 - [09-architectures/aws-webapp-architectures.md](09-architectures/aws-webapp-architectures.md)
 
-### 10 — Practice
+### 10 — Analytics & Data Lake
 
-- [10-practice/aws-saa-c03-questions-only.md](10-practice/aws-saa-c03-questions-only.md)
-- [10-practice/aws-saa-c03-practice-qanda.md](10-practice/aws-saa-c03-practice-qanda.md)
+- [10-analytics-data-lake/aws-analytics-data-lake.md](10-analytics-data-lake/aws-analytics-data-lake.md)
+
+### 11 — Practice
+
+- [11-practice/aws-saa-c03-questions-only.md](11-practice/aws-saa-c03-questions-only.md)
+- [11-practice/aws-saa-c03-practice-qanda.md](11-practice/aws-saa-c03-practice-qanda.md)
+
+### 12 — Cheat Sheets
+
+- [12-cheat-sheets/90min-exam-cram.md](12-cheat-sheets/90min-exam-cram.md)
+- [12-cheat-sheets/SAA-Handbook.md](12-cheat-sheets/SAA-Handbook.md)
+- [12-cheat-sheets/SAA-CO3-ExtendedNotes.md](12-cheat-sheets/SAA-CO3-ExtendedNotes.md)

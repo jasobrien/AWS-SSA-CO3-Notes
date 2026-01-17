@@ -362,6 +362,35 @@ This document expands every **exam-relevant AWS service** with **key attributes,
 * Public and private subnets
 * Route tables control traffic
 
+**CIDR quick guide (high-yield):**
+
+* CIDR format: `a.b.c.d/n` (example: `10.0.0.0/16`)
+  * `/n` is the number of **network bits**; the larger the `/n`, the **smaller** the network
+* Address count: $2^{(32-n)}$ total IPv4 addresses in the block
+* Common private ranges (RFC1918): `10.0.0.0/8`, `172.16.0.0/12`, `192.168.0.0/16`
+
+**Easy examples:**
+
+* `10.0.0.0/16` → 65,536 addresses (covers `10.0.0.0` → `10.0.255.255`)
+* `10.0.1.0/24` → 256 addresses (covers `10.0.1.0` → `10.0.1.255`)
+  * In AWS subnets, **5 IPs are reserved** (first 4 + last), so `/24` gives **251 usable** IPs
+* `10.0.1.0/28` → 16 addresses → **11 usable** in AWS (good for tiny subnets / demos)
+
+**Spot-checks (intuition builders):**
+
+* Is `10.0.1.0/24` inside `10.0.0.0/16`? → Yes (the `/16` covers `10.0.0.0` through `10.0.255.255`)
+* Do `10.0.1.0/24` and `10.0.1.0/28` overlap? → Yes (the `/28` is a smaller range inside the `/24`)
+
+**Subnetting pattern you’ll see on exams:**
+
+* VPC: `10.0.0.0/16`
+* 4 AZ subnets: `10.0.0.0/24`, `10.0.1.0/24`, `10.0.2.0/24`, `10.0.3.0/24` (one `/24` per AZ)
+
+**Exam signals & traps (CIDR):**
+
+* "Need VPC peering / Transit Gateway connectivity" → CIDR blocks must be **non-overlapping**
+* ❌ "Ran out of IPs" often means the subnet CIDR is too small (remember the 5 reserved IPs)
+
 **Default limits & numbers:**
 
 * **Subnets are AZ-scoped**

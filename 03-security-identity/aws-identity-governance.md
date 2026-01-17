@@ -49,6 +49,36 @@ Exam “tell”:
 
 ---
 
+## 2.1 AWS Control Tower (Landing Zone)
+
+### What it is
+
+Control Tower is a managed way to set up and govern a multi-account AWS environment (“landing zone”) on top of **Organizations**.
+
+At the exam level, think:
+
+- **Organizations + best-practice baseline** (accounts, guardrails, logging)
+- Standard structure that reduces DIY effort for multi-account governance
+
+### Key concepts (exam-level)
+
+- **Guardrails**: pre-packaged governance controls (implemented via SCPs and other mechanisms)
+- **Account Factory**: standardized account provisioning
+- Common baseline accounts:
+	- **Log archive** (centralized logs)
+	- **Audit / security** account
+
+### When it’s the best answer
+
+- “Need to **set up and govern** a new multi-account environment quickly”
+- “Need **standardized** account provisioning and guardrails”
+
+Exam “tell”:
+
+- “**Landing zone**” / “**set up multiple accounts with guardrails**” → Control Tower
+
+---
+
 ## 3. Service Control Policies (SCPs)
 
 ### What SCPs do

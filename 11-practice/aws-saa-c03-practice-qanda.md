@@ -1,6 +1,6 @@
 # AWS Solutions Architect Associate (SAA-C03) Practice Questions
 
-20 original practice questions covering key SAA-C03 domains. Each question includes the correct answer and explanations for why other options are incorrect.
+25 practice questions covering key SAA-C03 domains. Each question includes the correct answer and explanations for why other options are incorrect.
 
 ---
 
@@ -542,6 +542,147 @@ D. Copy logs daily to the security account’s S3 bucket manually
 - A: Public-read is insecure and violates best practices.
 - C: Managing individual IAM users across accounts is less scalable and secure than using roles.
 - D: Manual copies increase operational overhead and risk inconsistent access to logs.
+
+---
+
+---
+
+## Question 21 – Athena Cost Optimization
+
+**Domain:** Design Cost-Optimized Architectures
+
+A team uses Amazon Athena to query several years of application logs stored in Amazon S3. Query costs are high because each query scans large amounts of data. The team wants to reduce cost and improve query performance with minimal operational overhead.
+
+Which approach is MOST appropriate?
+
+A. Increase Athena workgroup limits and run queries more slowly
+B. Partition the data (for example by date) and store it in a columnar compressed format such as Parquet
+C. Move the logs to Amazon EBS volumes and run queries on an EC2 instance
+D. Use Amazon CloudFront to cache Athena query results at the edge
+
+**Correct answer:** B
+
+**Why B is correct:**
+
+- Athena cost and performance are heavily influenced by **bytes scanned**.
+- **Partitioning** (e.g., by date) reduces the amount of data scanned for typical time-bound queries.
+- **Parquet/ORC + compression** reduces scan size and improves query performance with low operational overhead.
+
+**Why the other options are incorrect:**
+
+- A: Workgroup limits don’t reduce bytes scanned; they don’t materially solve cost/performance.
+- C: Running queries on EC2 adds operational overhead and typically increases cost for this use case.
+- D: CloudFront is a CDN and does not cache Athena query execution/results in a way that solves scan-based query costs.
+
+---
+
+## Question 22 – Cataloging Data for a Data Lake
+
+**Domain:** Design High-Performing Architectures
+
+A company stores JSON and CSV datasets in Amazon S3 and wants analysts to query the data using SQL with Amazon Athena. The company wants to avoid manually managing schemas as new datasets arrive.
+
+Which solution is MOST appropriate?
+
+A. Use AWS Glue Crawlers to infer schemas and populate the AWS Glue Data Catalog for Athena
+B. Enable AWS Config rules to record object metadata changes in S3
+C. Export S3 Inventory reports and query them directly in Athena
+D. Build a custom fleet of EC2 instances to parse objects and generate Athena table definitions
+
+**Correct answer:** A
+
+**Why A is correct:**
+
+- **Glue Crawlers** can infer schemas and update the **Glue Data Catalog**.
+- Athena integrates directly with the **Glue Data Catalog**, enabling analysts to query datasets without hand-maintained table definitions.
+
+**Why the other options are incorrect:**
+
+- B: Config tracks resource configuration compliance; it’s not a schema/catalog solution.
+- C: S3 Inventory helps with object listing/metadata, not dataset schema discovery.
+- D: EC2-based custom parsing increases operational overhead versus a managed service designed for this purpose.
+
+---
+
+## Question 23 – Fine-Grained Data Lake Permissions
+
+**Domain:** Design Secure Architectures
+
+A company has a centralized data lake on Amazon S3. Multiple teams need access to shared datasets, but some columns contain PII and must be restricted. The company wants centrally managed, fine-grained permissions for data lake tables without building a custom authorization system.
+
+Which AWS service is MOST appropriate?
+
+A. AWS Lake Formation
+B. Amazon Macie
+C. AWS Key Management Service (AWS KMS)
+D. AWS WAF
+
+**Correct answer:** A
+
+**Why A is correct:**
+
+- Lake Formation provides centralized governance and **fine-grained permissions** (e.g., table/column-level) for data lakes built on S3 and the Glue Data Catalog.
+
+**Why the other options are incorrect:**
+
+- B: Macie discovers and classifies sensitive data in S3; it does not enforce table/column access policies for analytics queries.
+- C: KMS encrypts data at rest and controls key usage; it does not provide column-level query permissions.
+- D: WAF protects web applications from L7 attacks; it is unrelated to data lake access governance.
+
+---
+
+## Question 24 – Multi-Account Landing Zone
+
+**Domain:** Design Secure Architectures
+
+A company is starting fresh on AWS and wants to adopt a multi-account strategy with standardized account provisioning, centralized logging, and guardrails enforced across accounts. The company wants the fastest path with AWS-managed best practices.
+
+Which solution is MOST appropriate?
+
+A. AWS Control Tower
+B. AWS IAM Identity Center (AWS SSO) only
+C. AWS CloudTrail only
+D. Amazon VPC sharing without AWS Organizations
+
+**Correct answer:** A
+
+**Why A is correct:**
+
+- Control Tower sets up a multi-account landing zone using AWS best practices, including **guardrails**, standardized provisioning, and baseline logging/audit accounts.
+
+**Why the other options are incorrect:**
+
+- B: Identity Center solves workforce access/SSO but not landing zone governance and guardrails.
+- C: CloudTrail provides audit logs but does not create multi-account structure or enforce preventive guardrails.
+- D: VPC sharing is a networking feature and still requires an org/governance model; it doesn’t provide landing zone controls.
+
+---
+
+## Question 25 – Where to Enforce Authentication
+
+**Domain:** Design Secure Architectures
+
+A company runs a containerized web application on Amazon ECS behind an Application Load Balancer (ALB). The company needs to add user authentication using a managed identity provider with minimal changes to the application code.
+
+Which solution is MOST appropriate?
+
+A. Use ALB authentication with Amazon Cognito (OIDC) before forwarding requests to the target group
+B. Put Amazon CloudFront in front of the ALB and use CloudFront to authenticate users
+C. Create IAM users for end users and require them to sign API requests with SigV4
+D. Use AWS WAF to authenticate users and issue JWT tokens
+
+**Correct answer:** A
+
+**Why A is correct:**
+
+- ALB can perform authentication using an OIDC provider (including Cognito) and only forward authenticated requests to targets.
+- This minimizes application changes and keeps auth at the edge of the application tier.
+
+**Why the other options are incorrect:**
+
+- B: CloudFront improves performance and can restrict content, but it’s not the primary service for user authentication flows for an ALB-backed app.
+- C: IAM users + SigV4 is appropriate for programmatic AWS API access, not general end-user web authentication.
+- D: WAF is for request filtering/protection (SQLi/XSS/rate limiting), not issuing/validating user identity tokens.
 
 ---
 

@@ -240,3 +240,63 @@ A. Make the S3 bucket public-read
 B. Use an S3 bucket policy to allow access to an IAM role in the security account, and have users assume that role  
 C. Create IAM users in the logging account for each security engineer  
 D. Copy logs daily to the security account’s S3 bucket manually
+
+---
+
+21. **Athena Cost Optimization**  
+    **Domain:** Design Cost-Optimized Architectures  
+    A team uses Amazon Athena to query several years of application logs stored in Amazon S3. Query costs are high because each query scans large amounts of data. The team wants to reduce cost and improve query performance with minimal operational overhead.  
+    Which approach is MOST appropriate?
+
+A. Increase Athena workgroup limits and run queries more slowly
+B. Partition the data (for example by date) and store it in a columnar compressed format such as Parquet
+C. Move the logs to Amazon EBS volumes and run queries on an EC2 instance
+D. Use Amazon CloudFront to cache Athena query results at the edge
+
+---
+
+22. **Cataloging Data for a Data Lake**  
+    **Domain:** Design High-Performing Architectures  
+    A company stores JSON and CSV datasets in Amazon S3 and wants analysts to query the data using SQL with Amazon Athena. The company wants to avoid manually managing schemas as new datasets arrive.  
+    Which solution is MOST appropriate?
+
+A. Use AWS Glue Crawlers to infer schemas and populate the AWS Glue Data Catalog for Athena
+B. Enable AWS Config rules to record object metadata changes in S3
+C. Export S3 Inventory reports and query them directly in Athena
+D. Build a custom fleet of EC2 instances to parse objects and generate Athena table definitions
+
+---
+
+23. **Fine-Grained Data Lake Permissions**  
+    **Domain:** Design Secure Architectures  
+    A company has a centralized data lake on Amazon S3. Multiple teams need access to shared datasets, but some columns contain PII and must be restricted. The company wants centrally managed, fine-grained permissions for data lake tables without building a custom authorization system.  
+    Which AWS service is MOST appropriate?
+
+A. AWS Lake Formation
+B. Amazon Macie
+C. AWS Key Management Service (AWS KMS)
+D. AWS WAF
+
+---
+
+24. **Multi-Account Landing Zone**  
+    **Domain:** Design Secure Architectures  
+    A company is starting fresh on AWS and wants to adopt a multi-account strategy with standardized account provisioning, centralized logging, and guardrails enforced across accounts. The company wants the fastest path with AWS-managed best practices.  
+    Which solution is MOST appropriate?
+
+A. AWS Control Tower
+B. AWS IAM Identity Center (AWS SSO) only
+C. AWS CloudTrail only
+D. Amazon VPC sharing without AWS Organizations
+
+---
+
+25. **Where to Enforce Authentication**  
+    **Domain:** Design Secure Architectures  
+    A company runs a containerized web application on Amazon ECS behind an Application Load Balancer (ALB). The company needs to add user authentication using a managed identity provider with minimal changes to the application code.  
+    Which solution is MOST appropriate?
+
+A. Use ALB authentication with Amazon Cognito (OIDC) before forwarding requests to the target group
+B. Put Amazon CloudFront in front of the ALB and use CloudFront to authenticate users
+C. Create IAM users for end users and require them to sign API requests with SigV4
+D. Use AWS WAF to authenticate users and issue JWT tokens

@@ -194,8 +194,27 @@ Exam “tell”:
 ### Record types (high-yield)
 
 - **A / AAAA**: IPv4 / IPv6
-- **CNAME**: alias for non-root; cannot be used at zone apex
-- **ALIAS** (Route 53 feature): like CNAME but works at zone apex and for AWS resources (ALB, CloudFront, S3 website endpoints, etc.)
+- **CNAME**: maps a **name → another name** (e.g., `app.example.com` → `d123.cloudfront.net`)
+  - Cannot be used at the **zone apex** (root) (e.g., `example.com`) because apex must have SOA/NS records
+  - Typically introduces an additional DNS resolution step (client resolves CNAME target next)
+  - Works for any DNS name (inside or outside AWS), but not valid when you need an apex record
+- **ALIAS** (Route 53 feature): Route 53-only “name → AWS target” record that behaves like **A/AAAA** to the client
+  - **Can be used at the zone apex** (e.g., `example.com` → CloudFront / ALB)
+  - Lets you point at AWS resources whose IPs change, without hardcoding addresses
+  - Common alias targets: **CloudFront**, **ALB/NLB**, **API Gateway**, **S3 website endpoint**, **Global Accelerator**, and other Route 53 records in the same hosted zone
+  - Generally preferred over CNAME for AWS resources; Route 53 can answer with the current target IPs directly (no “CNAME hop” exposed to the client)
+  - Route 53 ALIAS queries are **not charged** as “Route 53 queries” (helpful exam detail: CNAME/A are normal queries)
+  - Not a standard DNS record type outside Route 53 (if you move DNS providers, you’ll re-model this)
+
+Quick exam heuristics:
+
+- “**Root domain needs to point to CloudFront/ALB**” → use **A/AAAA ALIAS** (not CNAME)
+- “**Subdomain points to another DNS name**” → often **CNAME** (unless you want ALIAS to an AWS target)
+
+Example (typical web setup):
+
+- `example.com` → **A (ALIAS)** → `d123456abcdef8.cloudfront.net`
+- `www.example.com` → **CNAME** → `example.com` (or directly to `d123456abcdef8.cloudfront.net`)
 
 ### Routing policies (common exam themes)
 

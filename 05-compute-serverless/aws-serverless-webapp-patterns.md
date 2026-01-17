@@ -91,6 +91,34 @@ Exam “tell”:
 
 ---
 
+## 3.1 ALB auth vs API Gateway auth (Common Exam Comparison)
+
+This shows up when the question is really about *where to enforce authentication*.
+
+### API Gateway + Cognito (authorizer)
+
+Use when:
+
+- You are building a **serverless REST/HTTP API** (API Gateway is already the “front door”).
+- You need API-focused features (usage plans/throttling, request validation, caching, API keys, etc.).
+
+Exam “tell”:
+
+- “**Serverless API with user auth**” → API Gateway authorizer + Cognito
+
+### ALB authentication (OIDC/Cognito)
+
+Use when:
+
+- Your entry point is an **ALB** (web app or microservices on ECS/EC2), and you want ALB to handle authentication before forwarding.
+- The question is framed as “web app behind ALB” rather than “API Gateway API.”
+
+Exam “tell”:
+
+- “**Web app behind ALB needs login without adding auth code to app**” → ALB authentication (often with Cognito)
+
+---
+
 ## 4. Data Layer Choices
 
 ### DynamoDB
