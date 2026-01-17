@@ -82,6 +82,39 @@ Exam “tell”:
 - “Steady baseline, want discount” → **RIs / Savings Plans**
 - “License bound to physical host / compliance” → **Dedicated Host**
 
+### Instance type costs (right level for exam)
+
+On the SAA exam, you rarely need exact $/hour pricing. You *do* need the cost **directionally**:
+
+- **General purpose (M)**: balanced CPU/memory → default choice; good cost for “typical web/app servers”
+- **Burstable (T)**: cheapest for low/variable CPU with a baseline; uses **CPU credits**
+  - Great for dev/test, small services, spiky-but-not-constant CPU
+  - Trap: sustained CPU can run out of credits (performance drops) → pick M/C if CPU is consistently high
+- **Compute optimized (C)**: more CPU per dollar when CPU-bound (batch, encoding, compute-heavy)
+- **Memory optimized (R/X)**: more RAM → typically higher cost; pick when memory-bound (caches, large JVM heaps)
+- **Accelerated (P/G/Inf)**: GPU/ML inference → most expensive; choose only when explicitly required
+
+High-yield cost levers:
+
+- **Graviton (ARM, e.g., `t4g`, `m7g`, `c7g`)**: often better price/performance than x86 *if your workload supports ARM*
+- **Newer generation** is usually better price/perf than older generation (all else equal)
+- **Right-size**: most cost waste is over-provisioning CPU/RAM; use metrics to pick size/family
+- **Mix instance types + Spot** in ASG (Mixed Instances Policy) for cheaper capacity when interruption is acceptable
+
+What “cost-effective EC2” typically means in questions:
+
+- “Steady workload” → **Savings Plans / RIs**
+- “Fault-tolerant / can be interrupted” → **Spot**
+- “Low average CPU, occasional spikes” → **T family**
+- “CPU pegged all day” → **C/M family** (not T)
+
+EC2 “total cost” reminder (common exam trick):
+
+- **Compute**: instance-hours (On-Demand vs RI/Savings Plan vs Spot)
+- **Storage**: EBS volumes (size + type) and snapshots
+- **Networking**: data transfer out to internet, inter-AZ traffic, and NAT Gateway processing (often a surprise big cost)
+- **Add-ons**: load balancers, CloudWatch Logs/metrics, and other managed services you attach
+
 ### Security highlights
 
 - Use **IAM roles** (instance profiles) instead of static access keys.
