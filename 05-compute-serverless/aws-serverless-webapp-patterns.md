@@ -54,6 +54,21 @@ Common concerns:
 - Cold starts (mitigate with provisioned concurrency if required)
 - Concurrency limits
 
+### API Gateway decision points (high-yield)
+
+Common scenario-driven knobs:
+
+- **Throttling / rate limits**: protect backends from traffic spikes.
+- **Caching**: reduce repeated requests and backend load for cacheable endpoints.
+- **Auth**: integrate with Cognito (user pools) or use Lambda authorizers when custom logic is required.
+- **Private APIs**: expose APIs privately inside a VPC (often combined with interface endpoints / PrivateLink patterns).
+- **VPC Link**: when API Gateway must reach **private** backends (typically via **NLB**).
+
+Quick comparison (exam-level):
+
+- **HTTP API**: simpler/lower cost for many common API patterns.
+- **REST API**: richer feature set (classic exam answers may still use “REST API” wording).
+
 ---
 
 ## 3. Authentication and Authorization

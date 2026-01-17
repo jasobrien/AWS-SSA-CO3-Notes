@@ -1,6 +1,6 @@
 # AWS Compute (SAA-C03) — Detailed Notes
 
-This document is a compute-focused companion to [aws-webapp-architectures.md](aws-webapp-architectures.md). It covers the major AWS compute choices, what they’re good at, and common SAA-C03 style decision points.
+This document is a compute-focused companion to [aws-webapp-architectures.md](../09-architectures/aws-webapp-architectures.md). It covers the major AWS compute choices, what they’re good at, and common SAA-C03 style decision points.
 
 ---
 

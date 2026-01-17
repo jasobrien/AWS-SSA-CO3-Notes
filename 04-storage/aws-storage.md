@@ -92,6 +92,54 @@ Exam “tell”:
 - Use **VPC Gateway Endpoints for S3** to keep traffic off the public internet and avoid NAT data processing costs.
 - Use **S3 Access Points** to simplify access control per application/team.
 
+### Private access patterns (CloudFront + VPC endpoints) (high-yield)
+
+These patterns show up in “keep the bucket private” exam scenarios.
+
+#### Pattern A: Private S3 + CloudFront for public content
+
+Goal: users access content via CloudFront, but the S3 bucket is not public.
+
+- Keep **S3 Block Public Access** enabled.
+- Use **CloudFront Origin Access Control (OAC)** (modern) or **Origin Access Identity (OAI)** (older) so only CloudFront can read from the bucket.
+- Bucket policy allows `s3:GetObject` only for the CloudFront origin identity/control.
+
+Exam “tell”:
+
+- “**Static website must not be publicly accessible in S3**” → CloudFront + OAC/OAI + private bucket
+
+#### Pattern B: Private subnets access S3 without NAT
+
+Goal: workloads in private subnets use S3 without internet egress.
+
+- Use an **S3 Gateway VPC Endpoint**.
+- Optionally restrict access with an **endpoint policy** and/or bucket policy conditions.
+
+Common restriction:
+
+- Allow bucket access only via your endpoint using `aws:sourceVpce` (resource policy condition).
+
+Exam “tell”:
+
+- “**Private subnets must access S3 without NAT/IGW**” → S3 gateway endpoint
+- “**Ensure S3 access only from your VPC**” → endpoint + bucket policy condition
+
+### Performance & data transfer patterns (high-yield)
+
+These show up frequently in scenario questions about upload speed, global performance, and secure direct uploads.
+
+- **Multipart upload**: best for large objects; improves throughput and allows retrying parts.
+- **Pre-signed URLs**: let clients upload/download directly to S3 without proxying through your app servers.
+  - Exam framing: “avoid scaling the web tier for file uploads” → pre-signed URL pattern.
+- **S3 Transfer Acceleration**: helps **global users upload** to a single region faster.
+- **CloudFront in front of S3**: improves **download** performance globally and supports HTTPS/custom domains.
+
+Exam “tell”:
+
+- “**Users worldwide need faster uploads to S3**” → Transfer Acceleration (or region design change)
+- “**Avoid routing large uploads through EC2/Lambda**” → pre-signed URLs
+- “**Large files and unreliable networks**” → multipart upload
+
 ### Versioning and retention
 
 - **Versioning** protects against accidental overwrites/deletes.
@@ -126,6 +174,79 @@ Common requirements:
 ### Static website hosting (common)
 
 - S3 can host static sites, often paired with **CloudFront** for HTTPS + caching + custom domains.
+
+---
+
+## Appendix A: S3 Bucket Policy Snippets (OAC/OAI + `aws:sourceVpce`)
+
+These are intentionally short templates for exam practice. Replace placeholders like `BUCKET`, `ACCOUNT_ID`, `DISTRIBUTION_ID`, and `VPCE_ID`.
+
+### A.1 CloudFront OAC (recommended) — allow CloudFront to read private S3
+
+Use when: “S3 must be private; only CloudFront can access it.”
+
+```json
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "AllowCloudFrontReadViaOAC",
+      "Effect": "Allow",
+      "Principal": { "Service": "cloudfront.amazonaws.com" },
+      "Action": "s3:GetObject",
+      "Resource": "arn:aws:s3:::BUCKET/*",
+      "Condition": {
+        "StringEquals": {
+          "AWS:SourceArn": "arn:aws:cloudfront::ACCOUNT_ID:distribution/DISTRIBUTION_ID"
+        }
+      }
+    }
+  ]
+}
+```
+
+### A.2 CloudFront OAI (legacy) — allow OAI canonical user to read
+
+Use when: the question explicitly mentions OAI (older wording).
+
+```json
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "AllowCloudFrontReadViaOAI",
+      "Effect": "Allow",
+      "Principal": { "CanonicalUser": "CLOUDFRONT_OAI_CANONICAL_USER_ID" },
+      "Action": "s3:GetObject",
+      "Resource": "arn:aws:s3:::BUCKET/*"
+    }
+  ]
+}
+```
+
+### A.3 Allow access only via a specific S3 Gateway VPC Endpoint
+
+Use when: “Only allow S3 access from my VPC / via my endpoint (no internet path).”
+
+```json
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "AllowOnlyFromSpecificVPCE",
+      "Effect": "Allow",
+      "Principal": "*",
+      "Action": ["s3:GetObject"],
+      "Resource": "arn:aws:s3:::BUCKET/*",
+      "Condition": {
+        "StringEquals": {
+          "aws:sourceVpce": "vpce-0123456789abcdef0"
+        }
+      }
+    }
+  ]
+}
+```
 
 ---
 

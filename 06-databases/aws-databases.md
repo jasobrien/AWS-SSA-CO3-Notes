@@ -52,6 +52,21 @@ Exam “tell”:
 
 - “**Read-heavy, need horizontal read scaling**” → Read replicas
 
+**HA vs DR (very common exam trap)**
+
+| Need                                                          | Best fit                                                   | Why                                                     |
+| ------------------------------------------------------------- | ---------------------------------------------------------- | ------------------------------------------------------- |
+| **High availability in the same region** (automatic failover) | **RDS Multi-AZ** / Aurora multi-AZ                         | Standby/replicas in another AZ; designed for failover.  |
+| **Read scaling** (more read throughput)                       | **Read replicas**                                          | Async replicas to spread reads; not the same as HA.     |
+| **Disaster recovery across regions**                          | **Cross-region read replica** / **Aurora Global Database** | Region-level resilience; better RPO than backups alone. |
+| **Recover from accidental deletion / point-in-time restore**  | **Automated backups + PITR**                               | Restores to a point in time within retention window.    |
+
+Exam “tell”:
+
+- “**Must survive AZ failure automatically**” → Multi-AZ
+- “**Need more read throughput**” → read replicas
+- “**Must survive region outage**” → cross-region strategy (replica/global DB)
+
 **Backups**
 
 - Automated backups + point-in-time restore (within retention window)
@@ -122,15 +137,43 @@ Fully managed NoSQL database. Commonly used for key-value and document access pa
   - Sort key (optional)
 - Access patterns should be modeled up-front.
 
+**Partition key design + hot partitions (very common exam trap)**
+
+- DynamoDB distributes data by **partition key**.
+- If too many requests hit the same partition key, you get a **hot partition** (throttling / uneven performance).
+
+Exam “tell”:
+
+- “**Throttling despite low overall traffic**” → hot partition / poor key distribution
+- “**One customer/device/user has massive traffic**” → use a better partition key strategy (more cardinality)
+
+Rule of thumb:
+
+- Pick partition keys with **high cardinality** and even distribution for your access pattern.
+
 **Scaling modes**
 
 - **On-demand capacity**: pay per request; great for spiky/unpredictable traffic
 - **Provisioned capacity**: plan capacity; can use auto scaling
 
+Exam “tell”:
+
+- “**Unpredictable traffic**” → on-demand
+- “**Predictable traffic and cost optimization**” → provisioned + auto scaling
+
 **Indexes**
 
 - **GSI** (Global Secondary Index): different partition/sort keys
 - **LSI** (Local Secondary Index): same partition key, different sort key
+
+High-yield decision:
+
+- Use a **GSI** when you need a different access pattern with a different partition key.
+- Use an **LSI** when you want alternate sort keys but keep the same partition key.
+
+Exam “tell”:
+
+- “**Need to query by an attribute that isn’t the primary key**” → add an index (often a GSI)
 
 **Durability/HA**
 
@@ -152,6 +195,14 @@ Exam “tell”:
 
 - In-memory cache for read-heavy workloads.
 
+What it’s for:
+
+- Reduce read latency for **read-heavy** workloads (and reduce load on DynamoDB).
+
+When it’s NOT the answer:
+
+- If you need complex query patterns, it’s usually an indexing/modeling issue, not DAX.
+
 Exam “tell”:
 
 - “**Microsecond read latency for DynamoDB**” → DAX
@@ -160,6 +211,38 @@ Exam “tell”:
 
 - Hot partition problems (poor key design)
 - Using DynamoDB for complex joins/queries (not ideal)
+
+### Worked example: Access patterns → key/index design (high-yield)
+
+Scenario: an e-commerce app needs to store and query orders.
+
+**Access patterns (what the app must do)**
+
+1. Get a single order by `orderId`.
+2. List orders for a customer (`customerId`) sorted by newest first.
+
+**Table design (base table)**
+
+- **PK**: `customerId`
+- **SK**: `createdAt#orderId` (lets you query newest-first by sorting)
+
+This makes pattern #2 easy:
+
+- Query `PK = customerId`, sort by `SK`.
+
+**Add a GSI for pattern #1 (lookup by orderId)**
+
+- **GSI1PK**: `orderId`
+- (Optional) **GSI1SK**: `customerId` or `createdAt`
+
+Now pattern #1 is:
+
+- Query GSI1 where `GSI1PK = orderId`.
+
+**Hot partition check (exam trap)**
+
+- If one customer can generate extreme traffic, `customerId` as the PK may become hot.
+- A common mitigation is to add more cardinality (e.g., include a shard suffix) while keeping queries workable.
 
 ---
 

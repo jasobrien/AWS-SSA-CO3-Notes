@@ -12,6 +12,7 @@ This document covers AWS services used to decouple systems and integrate compone
 - **Need workflow orchestration with retries/state?** → **Step Functions**
 - **Need managed Kafka-compatible streaming?** → **MSK**
 - **Need AWS-native streaming ingestion + shards?** → **Kinesis Data Streams**
+- **Need fully managed delivery of streaming data into S3/Redshift/OpenSearch?** → **Kinesis Data Firehose**
 - **Need to migrate from on-prem broker (JMS/AMQP) quickly?** → **Amazon MQ**
 
 ---
@@ -145,14 +146,58 @@ Exam “tell”:
 
 ### 5.1 Kinesis Data Streams
 
-- Streaming ingestion with shards.
-- Consumers can process records in near real-time.
+Kinesis Data Streams (KDS) is a **streaming data ingestion and replay** service.
+
+High-yield concepts:
+
+- **Shards**: unit of scaling. Throughput and parallelism scale by shard count.
+- **Ordering**: guaranteed **per shard / per partition key**, not globally.
+- **Retention**: supports replay for a retention window (hours → days).
+- **Consumers**: multiple independent consumers can read the same stream.
 
 Use when:
 
-- You need AWS-native streaming and fine control over throughput (shards)
+- You need **near real-time** ingestion and **replay** capability
+- You need fine control over throughput/parallelism (shards)
+- You have multiple consumer apps that need to process the same stream
 
-### 5.2 Amazon MSK (Managed Streaming for Apache Kafka)
+Common patterns:
+
+- Producers publish clickstream/IoT/log events → KDS
+- Consumers (Lambda, KCL apps, analytics) read and process
+
+Exam “tell”:
+
+- “**Need to reprocess/replay data from a stream**” → Kinesis Data Streams
+- “**Ordering matters for a given user/device**” → partition key → per-shard ordering
+
+Common gotchas:
+
+- KDS is **not** a queue: records can be read by multiple consumers.
+- Scaling is a capacity planning topic (shards); it’s not “infinite without thinking.”
+
+### 5.2 Kinesis Data Firehose
+
+Kinesis Data Firehose is a **fully managed delivery stream**. It’s for getting streaming data into common destinations with minimal ops.
+
+Typical destinations (high-yield):
+
+- **S3** (very common)
+- **Redshift** (usually via S3 staging)
+- **OpenSearch Service**
+- Many third-party endpoints (varies)
+
+Use when:
+
+- You want “**streaming → S3/data lake**” with minimal management
+- You want built-in buffering/batching and optional transformation (often via Lambda)
+
+Kinesis Data Streams vs Firehose (exam framing):
+
+- **Need replay / multiple consumers / custom processing pipeline** → **Kinesis Data Streams**
+- **Need easiest way to load streaming data into S3/Redshift/OpenSearch** → **Firehose**
+
+### 5.3 Amazon MSK (Managed Streaming for Apache Kafka)
 
 - Kafka-compatible managed service.
 
@@ -210,6 +255,8 @@ Exam “tell”:
 - “**Fanout to many consumers**” → SNS
 - “**Route events by content / event bus**” → EventBridge
 - “**Workflow with retries/branching**” → Step Functions
+- “**Deliver streaming data into S3/Redshift/OpenSearch with minimal ops**” → Firehose
+- “**Replay / reprocess stream data**” → Kinesis Data Streams
 - “**Kafka compatibility**” → MSK
 - “**Legacy broker protocols / minimal rewrite**” → Amazon MQ
 - “**Poison messages**” → DLQ

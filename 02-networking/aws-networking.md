@@ -12,6 +12,7 @@ This document focuses on AWS networking: VPC fundamentals, routing, security bou
 - **Need private access to AWS services without using the internet/NAT?** → **VPC Endpoints**
   - S3/DynamoDB → **Gateway Endpoint**
   - Most other services → **Interface Endpoint (PrivateLink)**
+  - (Quick refresher: [Gateways & Endpoints](aws-gateways-and-endpoints.md))
 - **Need to connect two VPCs (small number, simple)?** → **VPC Peering**
 - **Need hub-and-spoke networking across many VPCs/accounts?** → **Transit Gateway (TGW)**
 - **Need connect on-prem to AWS over the internet (encrypted)?** → **Site-to-Site VPN**
@@ -264,6 +265,21 @@ Exam “tell”:
 
 - “**Need consistent low-latency hybrid connection**” → Direct Connect
 - “**Need encryption over DX**” → DX + VPN
+
+### Direct Connect resiliency patterns (high-yield)
+
+Many SAA-C03 questions are really asking for **hybrid connectivity with predictable performance AND high availability**.
+
+Common best-practice answers:
+
+- **Redundant DX connections** (ideally in different locations) for higher availability.
+- **Site-to-Site VPN as backup** path (failover) when DX is down.
+- Use **Transit Gateway** when many VPCs/accounts need to share the same hybrid connectivity.
+
+Exam “tell”:
+
+- “**Hybrid connectivity must be highly available**” → redundant DX (often + VPN backup)
+- “**Need quick failover if dedicated link fails**” → DX + VPN backup
 
 ---
 

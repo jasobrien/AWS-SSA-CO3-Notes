@@ -1,62 +1,3 @@
-## 8. Required IAM Roles and Permissions
-
-Below are typical AWS IAM roles and permissions required for each solution. Always follow the principle of least privilege and tailor policies to your environment.
-
-### EC2-based Solution
-
-- **EC2 Instance Role:**
-  - `AmazonSSMManagedInstanceCore` (for SSM access/management)
-  - `CloudWatchAgentServerPolicy` (for logging/metrics)
-  - Custom policy for S3, Secrets Manager, Parameter Store, etc., as needed
-- **RDS Access:**
-  - Application instances need DB credentials (use Secrets Manager or Parameter Store)
-  - No direct IAM access to RDS unless using IAM DB authentication
-
-### ECS Fargate-based Solution
-
-- **Task Execution Role:**
-  - `AmazonECSTaskExecutionRolePolicy` (pull images, write logs)
-- **Task Role:**
-  - Custom policy for S3, DynamoDB, SQS, SNS, Secrets Manager, Parameter Store, etc., as needed by the app
-- **RDS Access:**
-  - As above, use Secrets Manager/Parameter Store for DB credentials
-- **DynamoDB Access:**
-  - Grant `dynamodb:PutItem`, `dynamodb:GetItem`, etc., as needed
-
-### Autoscaling and Monitoring
-
-- **Auto Scaling:**
-  - `AutoScalingFullAccess` (for management, not needed for runtime)
-- **CloudWatch Alarms/Logs:**
-  - `CloudWatchFullAccess` (for management)
-  - Runtime roles need only `PutMetricData`, `CreateLogStream`, `PutLogEvents`
-
-### Example: ECS Task Execution Role Policy (JSON)
-
-```json
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Effect": "Allow",
-      "Action": [
-        "ecr:GetAuthorizationToken",
-        "ecr:BatchCheckLayerAvailability",
-        "ecr:GetDownloadUrlForLayer",
-        "logs:CreateLogStream",
-        "logs:PutLogEvents"
-      ],
-      "Resource": "*"
-    }
-  ]
-}
-```
-
-**Note:**
-
-- Always scope resources and actions as tightly as possible.
-- Use managed policies where appropriate, but prefer custom policies for production.
-
 # Web Application Architectures on AWS: EC2, ECS Fargate, and Database Options
 
 This document explains common AWS architectures for a web application with web app and database tiers, including autoscaling, logging, and alerting. It compares solutions using EC2, ECS Fargate, and different database types, and discusses their pros and cons.
@@ -259,3 +200,64 @@ Below are example security group rules for a typical 2-tier web application:
 ---
 
 **All architectures should implement autoscaling, centralized logging, and alerting for production readiness.**
+
+---
+
+## 8. Required IAM Roles and Permissions
+
+Below are typical AWS IAM roles and permissions required for each solution. Always follow the principle of least privilege and tailor policies to your environment.
+
+### EC2-based Solution
+
+- **EC2 Instance Role:**
+  - `AmazonSSMManagedInstanceCore` (for SSM access/management)
+  - `CloudWatchAgentServerPolicy` (for logging/metrics)
+  - Custom policy for S3, Secrets Manager, Parameter Store, etc., as needed
+- **RDS Access:**
+  - Application instances need DB credentials (use Secrets Manager or Parameter Store)
+  - No direct IAM access to RDS unless using IAM DB authentication
+
+### ECS Fargate-based Solution
+
+- **Task Execution Role:**
+  - `AmazonECSTaskExecutionRolePolicy` (pull images, write logs)
+- **Task Role:**
+  - Custom policy for S3, DynamoDB, SQS, SNS, Secrets Manager, Parameter Store, etc., as needed by the app
+- **RDS Access:**
+  - As above, use Secrets Manager/Parameter Store for DB credentials
+- **DynamoDB Access:**
+  - Grant `dynamodb:PutItem`, `dynamodb:GetItem`, etc., as needed
+
+### Autoscaling and Monitoring
+
+- **Auto Scaling:**
+  - `AutoScalingFullAccess` (for management, not needed for runtime)
+- **CloudWatch Alarms/Logs:**
+  - `CloudWatchFullAccess` (for management)
+  - Runtime roles need only `PutMetricData`, `CreateLogStream`, `PutLogEvents`
+
+### Example: ECS Task Execution Role Policy (JSON)
+
+```json
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": [
+        "ecr:GetAuthorizationToken",
+        "ecr:BatchCheckLayerAvailability",
+        "ecr:GetDownloadUrlForLayer",
+        "logs:CreateLogStream",
+        "logs:PutLogEvents"
+      ],
+      "Resource": "*"
+    }
+  ]
+}
+```
+
+**Note:**
+
+- Always scope resources and actions as tightly as possible.
+- Use managed policies where appropriate, but prefer custom policies for production.
