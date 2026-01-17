@@ -19,6 +19,30 @@ Start here:
 
 ---
 
+## Encryption & Secure Transfer (high-yield)
+
+On SAA-C03, watch for phrases like “encrypt at rest”, “encrypt in transit”, “customer-managed keys”, “HIPAA/PCI”, and “private connectivity”.
+
+| Service | Secure transfer (in transit) | Encryption at rest | KMS / key detail (exam cues) |
+|---|---|---|---|
+| **S3 / Glacier classes** | HTTPS/TLS for API access | **SSE-S3** or **SSE-KMS** (or client-side) | “Need audit / CMK / key policy” → **SSE-KMS** |
+| **EBS** | N/A (block device attached to EC2) | EBS volume + snapshots encrypted | Uses **KMS** keys; encryption state carries to snapshots |
+| **EFS** | Supports encryption in transit | Encryption at rest | At-rest uses **KMS** (CMK if required) |
+| **FSx** | Protocol-level encryption supported (service-dependent) | Encryption at rest | At-rest uses **KMS** (commonly tested for compliance wording) |
+| **Storage Gateway** | TLS between gateway and AWS | Backed by S3 (and snapshots, depending on gateway type) | Often paired with **SSE-KMS** when “customer-managed keys” is required |
+| **DataSync** | TLS in transit | Depends on destination (S3/EFS/FSx) | Pick **SSE-KMS** for S3 or KMS-encrypted EFS/FSx if asked |
+| **Transfer Family** | SFTP/FTPS provide encrypted transport | Depends on S3/EFS target | “Use KMS keys / CMK” refers to encrypting the S3/EFS storage layer |
+| **AWS Backup** | Service-managed transfers | Backup vault encryption | Backup vaults use **KMS** (CMK if required) |
+| **Snow Family** | Offline device workflow | Encrypted on device + in AWS | Data is encrypted and keys are managed via **KMS** (common compliance cue) |
+
+Quick exam heuristics:
+
+- “**Encrypt at rest with customer-managed keys**” → look for **KMS/CMK** wording (e.g., **SSE-KMS**, EBS/EFS/FSx with CMK)
+- “**Encrypt in transit**” → look for **TLS/HTTPS** (S3/DataSync) or protocol encryption (SFTP/FTPS/SMB/NFS)
+- “**Keep traffic private (no internet/NAT)**” → **VPC endpoints** (S3 gateway / interface endpoints), plus TLS still applies
+
+---
+
 ## 1. Amazon S3 (Simple Storage Service)
 
 ### What it is
